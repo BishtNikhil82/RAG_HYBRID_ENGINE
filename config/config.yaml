@@ -1,0 +1,16 @@
+# ####################################
+# # Vector Database
+# ####################################
+# import os 
+# VECTOR_DB = os.environ.get("VECTOR_DB", "chroma")
+
+# Chroma
+# CHROMA_DATA_PATH = f"{DATA_DIR}/vector_db"
+# CHROMA_TENANT = os.environ.get("CHROMA_TENANT", chromadb.DEFAULT_TENANT)
+# CHROMA_DATABASE = os.environ.get("CHROMA_DATABASE", chromadb.DEFAULT_DATABASE)
+embedding_model: "all-MiniLM-L6-v2"
+vector_db_path: "chroma_vectordb"
+documents_directory: "data/policy_documents"
+llm_model: "phi3"
+top_k_docs: 
+

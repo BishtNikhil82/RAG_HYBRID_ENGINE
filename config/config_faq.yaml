@@ -1,0 +1,14 @@
+lic_queries_path: "data_faq/LIC_qeries.txt"
+lic_answers_path: "data_faq/answers.txt"
+lic_queries_dataset_path: "data_faq/lic_queries_dataset.csv"
+embedding_model: "all-MiniLM-L6-v2" ## all-MPNet-v2
+is_create_dataset: false
+positve_query_faiss_path: "faiss_db/lic_positve_embeddings.faiss"
+neg_query_faiss_path: "faiss_db/lic_negative_embeddings.faiss"
+dist_thresh: 0.5
+abbreviation_mapping:
+  LIC: "Life Insurance Policy"
+  TPA: "Third Party Administrator"
+  UIN: "Unique Identification Number"
+  IRDA: "Insurance Regulatory and Development Authority"
+  NAV: "Net Asset Value"
