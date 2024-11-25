@@ -1,0 +1,52 @@
+/***********Git Commands ****************/
+--- to add a file or folder 
+git add .
+git status
+git commit -m "Your message"
+git push origin main
+
+---cloning
+git clone https://github.com/username/repository.git
+cd repository
+
+git pull origin main
+git push origin main
+
+/**********************POST qery to RAG Engine *******************/
+url : ttp://127.0.0.1:5000/query
+type : POST
+BODY : {
+  "query": "What is LIC"
+}
+
+will get the response
+{
+    "query": "What is LIC",
+    "response": "LIC stands for Life Insurance Corporation of India. It is a state-owned insurance group and general insurer in India, engaged primarily in life insurance business. Established on January 19, 1956, by an Act of Parliament as per the provisions of its parent act (Life Insurance Corporation Act), it has since expanded to offer various financial services like retirement plans and mutual funds apart from providing health insurance through LIC Circles."
+}
+
+/**************************Python Commands *********************/
+python -m venv venv
+
+# On Windows
+venv\Scripts\activate
+
+# On Linux/Mac
+source venv/bin/activate
+
+pip install python-dotenv
+
+pip install -r .\requirements.txt
+
+ollama pull phi3:latest
+
+2. Disable WSL (Optional)
+If you want to fully disable WSL:
+
+Open Windows Features:
+
+Press Win + R, type optionalfeatures, and press Enter.
+
+export PYTHONPATH=$(pwd) // important for finding src folder 
+
+/****************************************************************************************/
