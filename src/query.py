@@ -1,35 +1,29 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from src.generator.create_prompt import get_prompt
 from src.vector_db_builder.chroma import load_chroma_db
-from src.fs_utils.file_system_utility import list_files, get_file_name_and_extension
-from config.load_config import load_yaml_config
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_ollama.llms import OllamaLLM
-from cachetools import TTLCache
-
-# Initialize FastAPI app
-app = FastAPI()
-
-# Define the Request Model for querying
-class QueryRequest(BaseModel):
-    query: str
-    doc_name: str
-
-# Global Variables
-interactive_engine = None
-cache = TTLCache(maxsize=1000, ttl=3600)  # Cache with a 1-hour TTL
-
+from src.fs_utils.file_system_utility import list_files, get_file_name_and_extension
+from config.load_config import load_yaml_config
 
 class InteractiveQueryHandler:
     def __init__(self, config_path):
         """
         Initialize the RAG Query Engine with preloaded collections.
+
+        Args:
+            config_path (str): Path to the configuration file.
         """
+        # Load the configuration
         self.config_dct = load_yaml_config(config_path)
+
+        # Preload all collections into memory
         self.collection_vectorstore_dct = self._load_all_collections()
+
+        # Initialize the LLM
         self.llm = OllamaLLM(model=self.config_dct["llm_model"])
+
+        # RAG chain for the current document
         self.rag_chain = None
 
     def get_collection_name_lst(self):
@@ -39,20 +33,32 @@ class InteractiveQueryHandler:
         for doc_path in docs_path_lst:
             doc_name, ext = get_file_name_and_extension(doc_path)
             collection_name_lst.append(doc_name)
+        
         return collection_name_lst
 
     def _load_all_collections(self):
+        """
+        Load all collections into a dictionary.
+
+        Returns:
+            dict: A dictionary mapping collection names to their vector stores.
+        """
         collection_name_lst = self.get_collection_name_lst()
         collection_vectorstore_dct = load_chroma_db(self.config_dct, collection_name_lst)
         return collection_vectorstore_dct
 
-    def init_rag_chain(self, doc_name):
+    def init_interactive_loop(self, doc_name):
         """
-        Initialize the RAG chain for a specific document.
+        Initialize the interactive loop for a specific document.
+
+        Args:
+            doc_name (str): Name of the document/collection to set up the RAG chain.
         """
+        # Ensure the collection exists in memory
         if doc_name not in self.collection_vectorstore_dct:
             raise ValueError(f"Document '{doc_name}' not found in collections.")
 
+        # Fetch the vector store for the document and set up the RAG chain
         vectorstore = self.collection_vectorstore_dct[doc_name]
         retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
         prompt = get_prompt()
@@ -63,63 +69,37 @@ class InteractiveQueryHandler:
             | StrOutputParser()
         )
 
-    def invoke_query(self, query):
+        print(f"Interactive loop initialized for document: {doc_name}")
+
+        # Start the interactive query-answering loop
+        self._interactive_query_loop()
+
+    def _interactive_query_loop(self):
         """
-        Use the RAG chain to handle a query.
+        Start the interactive query-answering loop for the current RAG chain.
         """
         if not self.rag_chain:
-            raise ValueError("RAG chain is not initialized. Call `init_rag_chain` first.")
-        return self.rag_chain.invoke(query)
+            raise ValueError("RAG chain is not initialized. Call `init_interactive_loop` first.")
 
+        while True:
+            query = input("Enter your query (or type 'bye' to exit): ")
+            if query.lower() == "bye":
+                print("Goodbye!")
+                break
 
-@app.on_event("startup")
-def startup_event():
-    """
-    Load configuration and initialize the InteractiveQueryHandler.
-    """
-    global interactive_engine
-    config_path = "config/config.yaml"
-    try:
-        print("Loading configuration...")
-        interactive_engine = InteractiveQueryHandler(config_path)
-        print("InteractiveQueryHandler initialized successfully.")
-    except Exception as e:
-        print(f"Failed to initialize InteractiveQueryHandler: {e}")
-        raise RuntimeError("Server failed to start due to initialization error.")
-
-
-@app.post("/query")
-async def query(request: QueryRequest):
-    """
-    Handle a query for a specific document.
-    """
-    global interactive_engine, cache
-
-    # Cache key combines the document name and query
-    cache_key = (request.query, request.doc_name)
-
-    try:
-        # Return cached response if available
-        if cache_key in cache:
-            return {"query": request.query, "response": cache[cache_key]}
-
-        # Initialize RAG chain for the requested document if not already initialized
-        interactive_engine.init_rag_chain(request.doc_name)
-
-        # Invoke the query using the RAG chain
-        response = interactive_engine.invoke_query(request.query)
-
-        # Cache the result and return it
-        cache[cache_key] = response
-        return {"query": request.query, "response": response}
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
-
+            # Use the initialized RAG chain to answer the query
+            response = self.rag_chain.invoke(query)
+            print("Response:", response)
+            print("Next")
 
 if __name__ == "__main__":
-    import uvicorn
+    config_path = "config/config.yaml"
+    # Instantiate the RAGQueryEngine
+    engine = InteractiveQueryHandler(config_path)
 
-    # Run the FastAPI server
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    # Initialize the interactive loop with a specific document name
+    doc_name = "512N277V02" #input("Enter the document name to load: ")
+    try:
+        engine.init_interactive_loop(doc_name)
+    except ValueError as e:
+        print(e)
