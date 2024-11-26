@@ -58,27 +58,53 @@ function setFocusOnDivWithId(elementId) {
       setFocusOnDivWithId(document.getElementById("loading-icon"));
 
       $('#chatSend').val(``);
+      
 
     const body = {
       query: "What is LIC",
       response: "LIC stands for Life Insurance Corporation of India"
     };
-    $.post("https://echo.free.beeceptor.com/sample-request", body, (data, status) => {
-console.log(data);
+
+    $.ajax({
+      url: "https://echo.free.beeceptor.com/sample-request",
+      type: "POST",
+      data: JSON.stringify(body), // Convert data to JSON string if needed
+      contentType: "application/json; charset=utf-8", // Set Content-Type header
+      dataType: "json", // Specify the expected response type
+      success: function(response) {
+          console.log("Success:", response);
+ 
+          $('#loading-icon').remove();
+
+          HTMLstr = ` 
+          
+          <span class="chat_msg_item chat_msg_item_admin"><div class="chat_avatar"><img src="avatar_ma6vug.png" /></div>`+ response.parsedBody.response + `   server response of msg ` + curchatmsg + `</span>`;
+          $('#chat_converseid').append(HTMLstr);
+      },
+      error: function(xhr, status, error) {
+          console.error("Error:", error);
+      }
+  });
+
+
+
+
+ //   $.post("https://echo.free.beeceptor.com/sample-request", body, (data, status) => {
+//console.log(data);
 //var dt = JSON.parse(data);
-console.log(data.parsedBody.response);
+//console.log(data.parsedBody.response);
 
 
    
 
-    $('#loading-icon').remove();
+//     $('#loading-icon').remove();
 
-    HTMLstr = ` 
+//     HTMLstr = ` 
     
-    <span class="chat_msg_item chat_msg_item_admin"><div class="chat_avatar"><img src="avatar_ma6vug.png" /></div>`+ data.parsedBody.response + `   server response of msg ` + curchatmsg + `</span>`;
-    $('#chat_converseid').append(HTMLstr);
+//     <span class="chat_msg_item chat_msg_item_admin"><div class="chat_avatar"><img src="avatar_ma6vug.png" /></div>`+ data.parsedBody.response + `   server response of msg ` + curchatmsg + `</span>`;
+//     $('#chat_converseid').append(HTMLstr);
 
-});
+//});
      // setFocusOnDivWithId('loading-icon');
 
     //  $('#loading-icon').scrollTop(10000);
