@@ -5,11 +5,27 @@ from config.load_config import load_yaml_config
 from src_faq.embedding_db_builder.save_load_embeddings import load_embeddings_index
 from src_faq.embedding_db_builder.create_embedding import EmbeddingService
 from server.interactive_query_handler import InteractiveQueryHandler
+from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 import re
 import os
 
 app = FastAPI()
+# Allowable origins for CORS
+origins = [
+    "http://127.0.0.1:5000",  # Frontend running locally
+    "http://localhost:5000", # Alternative localhost frontend
+]
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 class QueryRequest(BaseModel):
     query: str
@@ -166,7 +182,8 @@ async def query(request: QueryRequest):
             else:
                 print(f"Index {index} is out of range for answers list of length {len(faq_answers)}.")
                 answer = "Answer not found."
-            response = {"query": request.query, "mapped_question_index": index, "distance": dist, "answer": answer}
+            #response = {"query": request.query, "mapped_question_index": index, "distance": dist, "answer": answer}
+            response = answer
         else:
             # Step 2: Fallback to InteractiveQueryHandler if no mapping found
             print("************** Query TO  DOC engine *******************")

@@ -61,12 +61,12 @@ function setFocusOnDivWithId(elementId) {
       
 
     const body = {
-      query: "What is LIC",
-      response: "LIC stands for Life Insurance Corporation of India"
+      query: curchatmsg
+
     };
 
     $.ajax({
-      url: "https://echo.free.beeceptor.com/sample-request",
+      url: "http://127.0.0.1:5000/query",
       type: "POST",
       data: JSON.stringify(body), // Convert data to JSON string if needed
       contentType: "application/json; charset=utf-8", // Set Content-Type header
@@ -78,7 +78,7 @@ function setFocusOnDivWithId(elementId) {
 
           HTMLstr = ` 
           
-          <span class="chat_msg_item chat_msg_item_admin"><div class="chat_avatar"><img src="avatar_ma6vug.png" /></div>`+ response.parsedBody.response + `   server response of msg ` + curchatmsg + `</span>`;
+          <span class="chat_msg_item chat_msg_item_admin"><div class="chat_avatar"><img src="avatar_ma6vug.png" /></div>`+ response.response + `</span>`;
           $('#chat_converseid').append(HTMLstr);
       },
       error: function(xhr, status, error) {
@@ -185,4 +185,3 @@ function hideChat(hide) {
 //             break;
 //     }
 }
-
