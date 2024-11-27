@@ -49,4 +49,18 @@ Press Win + R, type optionalfeatures, and press Enter.
 
 export PYTHONPATH=$(pwd) // important for finding src folder 
 
+ pip install faiss-cpu
+
+ /*************Src if PWD not set ***************/
+
+ import os
+import sys
+
+# Ensure the project root is in sys.path
+project_root = os.path.abspath(os.path.dirname(__file__) + "/../")
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 /****************************************************************************************/
+
+adminuser01@NVIDIA-Server:~$ ps aux | grep ollama

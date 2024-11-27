@@ -66,7 +66,8 @@ function setFocusOnDivWithId(elementId) {
     };
 
     $.ajax({
-      url: "http://127.0.0.1:5000/query",
+       url: "http://127.0.0.1:5000/query",
+      //url: "http://4.240.32.18:5000/query",
       type: "POST",
       data: JSON.stringify(body), // Convert data to JSON string if needed
       contentType: "application/json; charset=utf-8", // Set Content-Type header
