@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException,Request
 from pydantic import BaseModel
 from cachetools import TTLCache
 from config.load_config import load_yaml_config
@@ -6,6 +6,8 @@ from src_faq.embedding_db_builder.save_load_embeddings import load_embeddings_in
 from src_faq.embedding_db_builder.create_embedding import EmbeddingService
 from server.interactive_query_handler import InteractiveQueryHandler
 from fastapi.middleware.cors import CORSMiddleware
+from audio_assistant.conversion import transcribe_audio,text_to_speech_gtts,text_to_speech_offline
+from fastapi.responses import FileResponse
 import numpy as np
 import re
 import os
@@ -151,6 +153,71 @@ def startup_event():
     except Exception as e:
         print(f"Error during startup: {str(e)}")
         raise RuntimeError("Server failed to start due to initialization error.")
+    
+
+# Temporary directory for storing audio files
+TEMP_DIR = "temp_audio"
+os.makedirs(TEMP_DIR, exist_ok=True)
+@app.post("/audio-query")
+async def audio_query(request: Request):
+    """
+    Handle a query where audio data is sent in the POST payload as binary.
+    """
+    try:
+        # Step 1: Read the audio data from the request body
+        audio_data = await request.body()
+        if not audio_data:
+            raise HTTPException(status_code=400, detail="No audio data provided in the request.")
+
+        # Step 2: Save audio data to a temporary file
+        temp_audio_path = os.path.join(TEMP_DIR, "input_audio.m4a")
+        with open(temp_audio_path, "wb") as temp_audio_file:
+            temp_audio_file.write(audio_data)
+
+        # Step 3: Convert audio to text
+        transcribed_text = transcribe_audio(temp_audio_path)  # Implement or call your transcription function
+        if not transcribed_text:
+            raise HTTPException(status_code=500, detail="Failed to transcribe the audio.")
+
+        print(f"Transcribed text: {transcribed_text}")
+
+        # Step 4: Check cache
+        cache_key = transcribed_text
+        if cache_key in cache:
+            print("************ Query TO CACHE *******************")
+            response_text = cache[cache_key]
+        else:
+            # Step 5: Process the text query with RAG
+            if not interactive_engine:
+                raise HTTPException(status_code=500, detail="Interactive engine is not initialized.")
+            
+            response_text = interactive_engine.invoke_query(transcribed_text)  # Adjust this to your RAG invocation
+            if not response_text:
+                raise HTTPException(status_code=500, detail="Failed to process the query with RAG.")
+            
+            # Cache the response
+            cache[cache_key] = response_text
+
+        print(f"RAG Response Text: {response_text}")
+
+        # Step 6: Convert response text back to audio
+        audio_response_path = os.path.join(TEMP_DIR, "response_audio.mp3")
+
+        text_to_speech_gtts(response_text, audio_response_path)  # Implement or call your TTS function
+        #text_to_speech_offline(response_text, audio_response_path)
+        # Step 7: Return the audio response
+        return FileResponse(
+            audio_response_path,
+            media_type="audio/mpeg",
+            filename="response_audio.mp3"
+        )
+
+    except HTTPException as http_ex:
+        raise http_ex
+    except Exception as e:
+        # Generic error handling
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+
 
 @app.post("/query")
 async def query(request: QueryRequest):
