@@ -9,6 +9,7 @@ from config.load_config import load_yaml_config
 from src.generator.create_prompt import get_prompt
 
 
+
 def merge_retrievers(retrievers):
     """
     Merge multiple retrievers into a single callable retriever.
@@ -16,7 +17,8 @@ def merge_retrievers(retrievers):
     def combined_retriever(query):
         results = []
         for retriever in retrievers:
-            results.extend(retriever.get_relevant_documents(query))
+            #results.extend(retriever.get_relevant_documents(query))
+            results.extend(retriever.invoke(query))
         return results
 
     return combined_retriever
