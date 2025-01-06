@@ -46,7 +46,7 @@ $('.zmdi-mail-send').click(function(e){
 
   const body = {
     query: curchatmsg,
-    client_id: "client1" // Ensure the clientID is set here
+    client_id: "client2" // Ensure the clientID is set here
   };
 
   $.ajax({

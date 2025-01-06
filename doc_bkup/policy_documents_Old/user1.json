@@ -1,0 +1,39 @@
+{
+  "user_id": "12345",
+  "platform": "Instagram",
+  "basic_info": {
+    "name": "John Doe",
+    "location": "New York",
+    "followers": 5000,
+    "following": 300,
+    "account_age": "5 years"
+  },
+  "engagement": {
+    "average_likes_per_post": 150,
+    "average_comments_per_post": 20,
+    "posts_per_week": 5
+  },
+  "content": {
+    "topics": ["travel", "photography", "fitness"],
+    "hashtags": ["#wanderlust", "#fitlife"],
+    "recent_posts": [
+      "Exploring the mountains today! #adventure #nature",
+      "Healthy living is a lifestyle. #fitnessjourney"
+    ]
+  },
+  "network": {
+    "connections": [
+      "Jane Smith",
+      "Robert Brown"
+    ]
+  },
+  "behavioral_patterns": {
+    "active_hours": ["8 AM - 10 AM", "7 PM - 9 PM"],
+    "engagement_peaks": "Weekends",
+    "sentiment": {
+      "positive": 70,
+      "neutral": 20,
+      "negative": 10
+    }
+  }
+}

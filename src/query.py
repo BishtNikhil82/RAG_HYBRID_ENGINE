@@ -21,7 +21,8 @@ class InteractiveQueryHandler:
         self.collection_vectorstore_dct = self._load_all_collections()
 
         # Initialize the LLM
-        self.llm = OllamaLLM(model=self.config_dct["llm_model"])
+        #self.llm = OllamaLLM(model=self.config_dct["llm_model"])
+        self.llm = OllamaLLM(model=self.config_dct["llm_model"],temperature=0.3,max_output_length=100 )
 
         # RAG chain for the current document
         self.rag_chain = None

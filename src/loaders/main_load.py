@@ -1,6 +1,7 @@
 import requests
 import logging
 import ftfy
+from src.loaders.json_loader import JsonLoader
 #import fs_utils.file_system_utility as fsutils
 from src.fs_utils import file_system_utility as fsutils
 from langchain_community.document_loaders import (
@@ -81,6 +82,9 @@ class Loader:
     def load(self, file_path: str):
         loader = self._get_loader(file_path)
         docs = loader.load()
+        # for doc in docs:
+        #     print(f"Page Content: {doc.page_content}")
+        #     print(f"Metadata: {doc.metadata}")
         return [
             Document(
                 page_content=ftfy.fix_text(doc.page_content), metadata=doc.metadata
@@ -94,6 +98,8 @@ class Loader:
         if file_ext == "pdf":
             loader = PyPDFLoader(
                 file_path)
+        elif file_ext =="json":
+            loader = JsonLoader(file_path)  # Replace with your actual JSON loader class
             
         return loader
 

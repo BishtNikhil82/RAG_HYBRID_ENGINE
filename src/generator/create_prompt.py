@@ -2,16 +2,38 @@ from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
 def get_prompt():
-    # RAG chain-specific prompt with a word limit
+    # Refined RAG chain-specific prompt with concise instructions
     template = """
-    You are an LIC policy expert. Use the context provided below to answer the user's question accurately and concisely. Ensure your response is limited to 200 words and relies only on the context provided. Do not include information outside the given context.
+    Answer the user's question based solely on the provided context. Ensure your response is accurate, concise, and grammatically correct. Do not exceed 100 words, and avoid including any information that is not explicitly mentioned in the context.
 
     Context:
     {context}
 
-    Question: {question}
+    Question:
+    {question}
 
-    Answer (maximum 200 words):
+    Answer (maximum 50 words):
     """
     return ChatPromptTemplate.from_template(template)
+
+# def get_prompt():
+#     template = """
+#     Based on the provided context, determine the user's score and provide a detailed explanation for the score.
+
+#     - The score should be a value between 0 and 100.
+#     - Provide a detailed reasoning for the score.
+
+#     Context:
+#     {context}
+
+#     Question:
+#     {question}
+
+#     Answer:
+#     Score: {{value between 0 and 100}}
+#     Reasoning: {{detailed reasoning for the score}}
+#     """
+#     return ChatPromptTemplate.from_template(template)
+
+
 

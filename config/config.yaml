@@ -10,7 +10,8 @@
 # CHROMA_DATABASE = os.environ.get("CHROMA_DATABASE", chromadb.DEFAULT_DATABASE)
 embedding_model: "all-MiniLM-L6-v2"
 vector_db_path: "chroma_vectordb"
-documents_directory: "data/policy_documents"
+model_cache_db_path: "src_model_cache/model_db"
+documents_directory: "data"  # Base directory containing client folders
 llm_model: "phi3"
-top_k_docs: 
+top_k_docs: 3
 

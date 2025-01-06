@@ -29,7 +29,8 @@ def get_rag_chain(config_dct, doc_name):
     #docs = retriever.invoke("What is Appointee ?")
     #print(len(docs))
     llm_model_name = config_dct["llm_model"]
-    llm = OllamaLLM(model=llm_model_name)
+    #llm = OllamaLLM(model=llm_model_name)
+    llm = OllamaLLM(model=llm_model_name,temperature=0.3,max_output_length=50 )
     rag_chain = (
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
