@@ -6,7 +6,10 @@ from langchain_ollama.llms import OllamaLLM
 from src.fs_utils.file_system_utility import list_files, get_file_name_and_extension
 from config.load_config import load_yaml_config
 from src.generator.create_prompt import get_prompt
+from openai import OpenAI
+from openai import api_key as openai_api_key
 import os
+from langchain.chat_models import ChatOpenAI
 
 
 def merge_retrievers(retrievers):
@@ -23,7 +26,8 @@ class InteractiveQueryHandler:
         self.config_dct = load_yaml_config(config_path)
         #self.embedding_function = self._initialize_embedding_function()
         self.collection_vectorstore_dct = self._load_all_collections()
-        self.llm = OllamaLLM(model=self.config_dct["llm_model"],temperature=0.3,max_output_length=100 )
+        #self.llm = OllamaLLM(model=self.config_dct["llm_model"],temperature=0.3,max_output_length=100 )
+        self.llm = None
         self.rag_chain = None
 
     # def _initialize_embedding_function(self):
@@ -41,22 +45,26 @@ class InteractiveQueryHandler:
         collection_name_lst = self.get_collection_name_lst()
         collection_vectorstore_dct = load_chroma_db(self.config_dct, collection_name_lst)
         return collection_vectorstore_dct
+    
+    def set_llm_model(self):
+        use_openai = self.config_dct.get("use_openai", False)  # Compilation flag, default is False
+        if use_openai:
+            print("*************** Using OpenAI for LLM **********")
+            os.environ["OPENAI_API_KEY"] = self.config_dct.get("OPENAI_API_KEY")
+            self.llm = ChatOpenAI(temperature=0.7, model_name=self.config_dct.get("gpt_model"))
+            # openai_api_key = self.config_dct.get("OPENAI_API_KEY")
+            # self.llm = OpenAI(
+            #     model_name=self.config_dct.get("gpt_model"),  # Example: "gpt-3.5-turbo" or "gpt-4"
+            #     temperature=0.7,  # Adjust as per requirement
+            #     openai_api_key=openai_api_key,
+            # )
+        else:
+            print("******************** Using Ollama for LLM ************************")
+            self.llm = OllamaLLM(model=self.config_dct["llm_model"])
 
+    
     def init_global_rag_chain(self):
-        # all_retrievers = [
-        #     vectorstore.as_retriever(search_kwargs={"k": 3})
-        #     for vectorstore in self.collection_vectorstore_dct.values()
-        # ]
-        # merged_retriever = merge_retrievers(all_retrievers)
-
-        # prompt = get_prompt()
-        # self.rag_chain = (
-        #     {"context": merged_retriever, "question": RunnablePassthrough()}
-        #     | prompt
-        #     | self.llm
-        #     | StrOutputParser()
-        #)
- # RAG chain (will dynamically update retriever at runtime)
+        self.set_llm_model()
         prompt = get_prompt()
         self.rag_chain = (
             {"context": RunnablePassthrough(), "question": RunnablePassthrough()}

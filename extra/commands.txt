@@ -92,3 +92,21 @@ python3.10 --version // verify the version
 
 /*******************************GPU realted ************/
 watch -n 1 nvidia-smi
+
+/******************************************Linux Commands **************/
+(1) sudo lsof -i -P -n | grep LISTEN
+(2) sudo netstat -tuln
+
+
+/********** Chatwoot realted **************/
+nano ~/.bashrc
+[ -z "$LOGIN_SHELL" ] && export LOGIN_SHELL=1 && exec $SHELL --login
+
+sudo -u postgres psql
+ALTER USER postgres WITH PASSWORD 'your_secure_password';
+pwd is 1234
+
+http://localhost:3000
+user name: john@acme.inc
+password: Password1!
+foreman start -f Procfile.dev

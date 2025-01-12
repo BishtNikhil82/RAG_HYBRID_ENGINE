@@ -8,10 +8,13 @@
 # CHROMA_DATA_PATH = f"{DATA_DIR}/vector_db"
 # CHROMA_TENANT = os.environ.get("CHROMA_TENANT", chromadb.DEFAULT_TENANT)
 # CHROMA_DATABASE = os.environ.get("CHROMA_DATABASE", chromadb.DEFAULT_DATABASE)
+use_LLM: false  # Set to true to use LLM models for RAG engine
+use_openai: true  # Set to true to use OpenAI, false for Ollama
+gpt_model: "gpt-4o-mini"
 embedding_model: "all-MiniLM-L6-v2"
 vector_db_path: "chroma_vectordb"
 model_cache_db_path: "src_model_cache/model_db"
 documents_directory: "data"  # Base directory containing client folders
 llm_model: "phi3"
 top_k_docs: 3
-
+OPENAI_API_KEY: "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"

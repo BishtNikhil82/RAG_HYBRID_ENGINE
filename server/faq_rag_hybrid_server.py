@@ -155,23 +155,27 @@ def startup_event():
         print("Initializing server...")
         config_path_doc = "config/config.yaml"
         config_path_faq = "config/config_faq.yaml"
-        config_dct = load_yaml_config(config_path_faq)
-
+        config_dct_faq = load_yaml_config(config_path_faq)
+        config_dct_main = load_yaml_config(config_path_doc) #main config to set models
         #load all indcies of model_cache
         load_all_indices(config_path_doc)
 
-        # Interactive query handler
-        interactive_engine = InteractiveQueryHandler(config_path_doc)
-        interactive_engine.init_global_rag_chain()
+        use_llm_model = config_dct_main.get("use_LLM", False)  # Compilation flag to use LLM or not
+        if use_llm_model:
+            print(" *********** LLM model wil be used for all the clients ********* ")
+            interactive_engine = InteractiveQueryHandler(config_path_doc)
+            interactive_engine.init_global_rag_chain()
+        else:
+            print("*************** NO LLM Model Will BE USed for all the  Clients, Make Logic Separate for every Client **************")
 
         # Embedding service and database index
         embedding_service_obj = EmbeddingService(config_path_faq)
         #db_index = load_embeddings_index(config_dct)
-        db_indices = load_all_embeddings_indices(config_dct)
+        db_indices = load_all_embeddings_indices(config_dct_faq)
         #print(f"Embeddings index loaded: {db_index}")
-        dist_thresh = config_dct.get("dist_thresh", 0.5)  # Default value if missing
+        dist_thresh = config_dct_faq.get("dist_thresh", 0.5)  # Default value if missing
         # FAQ Answers
-        all_faq_answers = load_all_answers(config_dct)
+        all_faq_answers = load_all_answers(config_dct_faq)
         # if not faq_answers:
         #     raise RuntimeError("FAQ answers not loaded.")
 
@@ -230,6 +234,10 @@ async def query(request: QueryRequest):
             # Search for similar embeddings
             answer = search_embedding(request.client_id, embedding)
             if not answer:
+                if interactive_engine is None:
+                    print("***** interactive_engine Client not subscribed to use LLM Model*****")
+                    answer = "Answere not found in All the Cache and DB returning to Agent *****"
+                    return
                 print("*****Cache miss in Model Cache. Call to the Model FInally *****")
                 answer = interactive_engine.handle_query(request.client_id, request.query)
                 #add embedding to model cache
