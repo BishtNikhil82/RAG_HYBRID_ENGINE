@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 from cachetools import TTLCache
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,6 +42,34 @@ abbreviation_mapping = {}
 dist_thresh = None
 cache = TTLCache(maxsize=1000, ttl=3600)
 all_faq_answers = {}
+
+from fastapi import Request
+
+@app.post("/webhook")
+async def webhook_handler(payload: dict, secret: str = Header(None)):
+    #WEBHOOK_SECRET = "your-secret-key"  # Replace with an environment variable in production
+    
+    # Validate the secret
+    #if secret != WEBHOOK_SECRET:
+        #raise HTTPException(status_code=403, detail="Unauthorized")
+
+    print("Webhook payload received:", payload)
+    event_type = payload.get("event_type")
+    data = payload.get("data")
+    
+    # Process different event types
+    if event_type == "new_user":
+        print(f"New user event received: {data}")
+        # Add custom logic for "new_user" events
+    elif event_type == "update":
+        print(f"Update event received: {data}")
+        # Add custom logic for "update" events
+    else:
+        print(f"Unhandled event type: {event_type}")
+    
+    return {"status": "success", "message": "Webhook processed"}
+
+
 
 
 # Helper function to preprocess user query
