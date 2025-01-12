@@ -236,8 +236,9 @@ async def query(request: QueryRequest):
             if not answer:
                 if interactive_engine is None:
                     print("***** interactive_engine Client not subscribed to use LLM Model*****")
-                    answer = "Answere not found in All the Cache and DB returning to Agent *****"
-                    return
+                    answer = "Answere not found returning to Agent "
+                    response["response"] = answer
+                    return response
                 print("*****Cache miss in Model Cache. Call to the Model FInally *****")
                 answer = interactive_engine.handle_query(request.client_id, request.query)
                 #add embedding to model cache

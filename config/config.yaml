@@ -8,7 +8,7 @@
 # CHROMA_DATA_PATH = f"{DATA_DIR}/vector_db"
 # CHROMA_TENANT = os.environ.get("CHROMA_TENANT", chromadb.DEFAULT_TENANT)
 # CHROMA_DATABASE = os.environ.get("CHROMA_DATABASE", chromadb.DEFAULT_DATABASE)
-use_LLM: false  # Set to true to use LLM models for RAG engine
+use_LLM: true  # Set to true to use LLM models for RAG engine
 use_openai: true  # Set to true to use OpenAI, false for Ollama
 gpt_model: "gpt-4o-mini"
 embedding_model: "all-MiniLM-L6-v2"

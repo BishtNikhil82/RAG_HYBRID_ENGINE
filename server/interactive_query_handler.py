@@ -52,12 +52,6 @@ class InteractiveQueryHandler:
             print("*************** Using OpenAI for LLM **********")
             os.environ["OPENAI_API_KEY"] = self.config_dct.get("OPENAI_API_KEY")
             self.llm = ChatOpenAI(temperature=0.7, model_name=self.config_dct.get("gpt_model"))
-            # openai_api_key = self.config_dct.get("OPENAI_API_KEY")
-            # self.llm = OpenAI(
-            #     model_name=self.config_dct.get("gpt_model"),  # Example: "gpt-3.5-turbo" or "gpt-4"
-            #     temperature=0.7,  # Adjust as per requirement
-            #     openai_api_key=openai_api_key,
-            # )
         else:
             print("******************** Using Ollama for LLM ************************")
             self.llm = OllamaLLM(model=self.config_dct["llm_model"])
